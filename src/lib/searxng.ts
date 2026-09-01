@@ -1,7 +1,6 @@
-import axios from 'axios';
-import { getSearxngApiEndpoint } from '../config';
+import { getSearxngURL } from './config/serverRegistry';
 
-interface SearxngSearchOptions {
+export interface SearxngSearchOptions {
   categories?: string[];
   engines?: string[];
   language?: string;
@@ -23,25 +22,46 @@ export const searchSearxng = async (
   query: string,
   opts?: SearxngSearchOptions,
 ) => {
-  const searxngURL = getSearxngApiEndpoint();
+  const searxngURL = getSearxngURL();
 
   const url = new URL(`${searxngURL}/search?format=json`);
   url.searchParams.append('q', query);
 
   if (opts) {
     Object.keys(opts).forEach((key) => {
-      if (Array.isArray(opts[key])) {
-        url.searchParams.append(key, opts[key].join(','));
+      const value = opts[key as keyof SearxngSearchOptions];
+      if (Array.isArray(value)) {
+        url.searchParams.append(key, value.join(','));
         return;
       }
-      url.searchParams.append(key, opts[key]);
+      url.searchParams.append(key, value as string);
     });
   }
 
-  const res = await axios.get(url.toString());
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-  const results: SearxngSearchResult[] = res.data.results;
-  const suggestions: string[] = res.data.suggestions;
+  try {
+    const res = await fetch(url, {
+      signal: controller.signal,
+    });
 
-  return { results, suggestions };
+    if (!res.ok) {
+      throw new Error(`SearXNG error: ${res.statusText}`);
+    }
+
+    const data = await res.json();
+
+    const results: SearxngSearchResult[] = data.results;
+    const suggestions: string[] = data.suggestions;
+
+    return { results, suggestions };
+  } catch (err: any) {
+    if (err.name === 'AbortError') {
+      throw new Error('SearXNG search timed out');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 };

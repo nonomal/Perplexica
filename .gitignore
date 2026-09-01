@@ -4,9 +4,9 @@ npm-debug.log
 yarn-error.log
 
 # Build output
-/.next/
-/out/
-/dist/
+.next/
+out/
+dist/
 
 # IDE/Editor specific
 .vscode/
@@ -36,3 +36,6 @@ Thumbs.db
 
 # Db
 db.sqlite
+/searxng
+
+certificates

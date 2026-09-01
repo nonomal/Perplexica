@@ -1,30 +1,73 @@
-# How to Contribute to Perplexica
+# How to Contribute to Vane
 
-Hey there, thanks for deciding to contribute to Perplexica. Anything you help with will support the development of Perplexica and will make it better. Let's walk you through the key aspects to ensure your contributions are effective and in harmony with the project's setup.
+Thanks for your interest in contributing to Vane! Your help makes this project better. This guide explains how to contribute effectively.
+
+Vane is a modern AI chat application with advanced search capabilities.
 
 ## Project Structure
 
-Perplexica's design consists of two main domains:
+Vane's codebase is organized as follows:
 
-- **Frontend (`ui` directory)**: This is a Next.js application holding all user interface components. It's a self-contained environment that manages everything the user interacts with.
-- **Backend (root and `src` directory)**: The backend logic is situated in the `src` folder, but the root directory holds the main `package.json` for backend dependency management.
+- **UI Components and Pages**:
+  - **Components (`src/components`)**: Reusable UI components.
+  - **Pages and Routes (`src/app`)**: Next.js app directory structure with page components.
+    - Main app routes include: home (`/`), chat (`/c`), discover (`/discover`), and library (`/library`).
+  - **API Routes (`src/app/api`)**: Server endpoints implemented with Next.js route handlers.
+- **Backend Logic (`src/lib`)**: Contains all the backend functionality including search, database, and API logic.
+  - The search system lives in `src/lib/agents/search`.
+  - The search pipeline is split into classification, research, widgets, and writing.
+  - Database functionality is in `src/lib/db`.
+  - Chat model and embedding model providers are in `src/lib/models/providers`, and models are loaded via `src/lib/models/registry.ts`.
+  - Prompt templates are in `src/lib/prompts`.
+  - SearXNG integration is in `src/lib/searxng.ts`.
+  - Upload search lives in `src/lib/uploads`.
+
+### Where to make changes
+
+If you are not sure where to start, use this section as a map.
+
+- **Search behavior and reasoning**
+
+  - `src/lib/agents/search` contains the core chat and search pipeline.
+  - `classifier.ts` decides whether research is needed and what should run.
+  - `researcher/` gathers information in the background.
+
+- **Add or change a search capability**
+
+  - Research tools (web, academic, discussions, uploads, scraping) live in `src/lib/agents/search/researcher/actions`.
+  - Tools are registered in `src/lib/agents/search/researcher/actions/index.ts`.
+
+- **Add or change widgets**
+
+  - Widgets live in `src/lib/agents/search/widgets`.
+  - Widgets run in parallel with research and show structured results in the UI.
+
+- **Model integrations**
+
+  - Providers live in `src/lib/models/providers`.
+  - Add new providers there and wire them into the model registry so they show up in the app.
+
+- **Architecture docs**
+  - High level overview: `docs/architecture/README.md`
+  - High level flow: `docs/architecture/WORKING.md`
+
+## API Documentation
+
+Vane includes API documentation for programmatic access.
+
+- **Search API**: For detailed documentation, see `docs/API/SEARCH.md`.
 
 ## Setting Up Your Environment
 
 Before diving into coding, setting up your local environment is key. Here's what you need to do:
 
-### Backend
+1. Run `npm install` to install all dependencies.
+2. Use `npm run dev` to start the application in development mode.
+3. Open http://localhost:3000 and complete the setup in the UI (API keys, models, search backend URL, etc.).
 
-1. In the root directory, locate the `sample.config.toml` file.
-2. Rename it to `config.toml` and fill in the necessary configuration fields specific to the backend.
-3. Run `npm install` to install dependencies.
-4. Use `npm run dev` to start the backend in development mode.
+Database migrations are applied automatically on startup.
 
-### Frontend
-
-1. Navigate to the `ui` folder and repeat the process of renaming `.env.example` to `.env`, making sure to provide the frontend-specific variables.
-2. Execute `npm install` within the `ui` directory to get the frontend dependencies ready.
-3. Launch the frontend development server with `npm run dev`.
+For full installation options (Docker and non Docker), see the installation guide in the repository README.
 
 **Please note**: Docker configurations are present for setting up production environments, whereas `npm run dev` is used for development purposes.
 
@@ -36,4 +79,4 @@ Before committing changes:
 2. Always run `npm run format:write` to format your code according to the project's coding standards. This helps maintain consistency and code quality.
 3. We currently do not have a code of conduct, but it is in the works. In the meantime, please be mindful of how you engage with the project and its community.
 
-Following these steps will help maintain the integrity of Perplexica's codebase and facilitate a smoother integration of your valuable contributions. Thank you for your support and commitment to improving Perplexica.
+Following these steps will help maintain the integrity of Vane's codebase and facilitate a smoother integration of your valuable contributions. Thank you for your support and commitment to improving Vane.
